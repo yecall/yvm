@@ -19,26 +19,31 @@
  *
  */
 
-package token
+package ast
 
-type Token struct {
-	Type    TokenType
-	Literal string
+type Node interface {
+	TokenLiteral() string
 }
 
-var keywords = map[string]TokenType{
-	"fn":     FUNCTION,
-	"let":    LET,
-	"true":   TRUE,
-	"false":  FALSE,
-	"if":     IF,
-	"else":   ELSE,
-	"return": RETURN,
+type Statement interface {
+	Node
+	statementNode()
 }
 
-func LookupIdent(ident string) TokenType {
-	if tok, ok := keywords[ident]; ok {
-		return tok
+type Expression interface {
+	Node
+	expressionNode()
+}
+
+type Program struct {
+	Statements []Statement
+}
+
+func (p *Program) TokenLiteral() string {
+	if len(p.Statements) > 0 {
+		return p.Statements[0].TokenLiteral()
+	} else {
+		return ""
 	}
-	return IDENT
 }
+

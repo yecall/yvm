@@ -64,14 +64,14 @@ var tokenString = [...]string{
 	INT:       "integer",
 	ASSIGN:    "=",
 	PLUS:      "+",
-	MINUS:"-",
-	BANG:"!",
-	ASTERISK:"*",
-	SLASH:"/",
-	LT:"<",
-	GT:">",
-	EQ:"==",
-	NOT_EQ:"!=",
+	MINUS:     "-",
+	BANG:      "!",
+	ASTERISK:  "*",
+	SLASH:     "/",
+	LT:        "<",
+	GT:        ">",
+	EQ:        "==",
+	NOT_EQ:    "!=",
 	COMMA:     ",",
 	SEMICOLON: ";",
 	LPAREN:    "(",
@@ -80,19 +80,18 @@ var tokenString = [...]string{
 	RBRACE:    "}",
 	FUNCTION:  "function",
 	LET:       "let",
-	TRUE:"true",
-	FALSE:"false",
-	IF:"if",
-	ELSE:"else",
-	RETURN:"return",
+	TRUE:      "true",
+	FALSE:     "false",
+	IF:        "if",
+	ELSE:      "else",
+	RETURN:    "return",
 }
 
 func (t TokenType) String() string {
-    if t < 0 || int(t) > len(tokenString) {
-    	    return "invalid token"
+	if t < 0 || int(t) > len(tokenString) {
+		return "invalid token"
 	}
 	return tokenString[t]
 }
-
 
 //TODO: define the language and add new token type

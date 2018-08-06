@@ -22,8 +22,8 @@
 package token
 
 import (
-	"testing"
 	"fmt"
+	"testing"
 )
 
 func TestTokenType_String(t *testing.T) {

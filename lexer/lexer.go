@@ -24,10 +24,10 @@ package lexer
 import "github.com/yeeco/yvm/token"
 
 type Lexer struct {
-	input string
-	position  int
-	readPosition  int
-	ch  byte
+	input        string
+	position     int
+	readPosition int
+	ch           byte
 }
 
 func NewLexer(input string) *Lexer {
@@ -104,7 +104,6 @@ func (l *Lexer) NextToken() token.Token {
 	l.readChar()
 	return tok
 }
-
 
 func (l *Lexer) skipWhitespace() {
 	for l.ch == ' ' || l.ch == '\t' || l.ch == '\n' || l.ch == '\r' {
