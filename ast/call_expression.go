@@ -24,29 +24,30 @@ package ast
 import (
 	"github.com/yeeco/yvm/token"
 	"bytes"
+	"strings"
 )
 
-type IfExpression struct {
+type CallExpression struct {
 	Token token.Token
-	Condition Expression
-	Consequence *BlockStatement
-	Alternative *BlockStatement
+	Function Expression
+	Arguments []Expression
 }
 
-func (ie *IfExpression) expressionNode() {}
-func (ie *IfExpression) TokenLiteral() string {return ie.Token.Literal}
-func (ie *IfExpression) String() string {
+func (ce *CallExpression) expressionNode() {}
+func (ce *CallExpression) TokenLiteral() string {return ce.Token.Literal}
+func (ce *CallExpression) String() string {
 	var out bytes.Buffer
 
-	out.WriteString("if")
-	out.WriteString(ie.Condition.String())
-	out.WriteString(" ")
-	out.WriteString(ie.Consequence.String())
-
-	if ie.Alternative != nil {
-		out.WriteString("else")
-		out.WriteString(ie.Alternative.String())
+	args := []string{}
+	for _, a := range ce.Arguments {
+		args = append(args, a.String())
 	}
+
+	out.WriteString(ce.Function.String())
+	out.WriteString("(")
+	out.WriteString(strings.Join(args, ", "))
+	out.WriteString(")")
 
 	return out.String()
 }
+
