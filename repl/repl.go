@@ -28,6 +28,7 @@ import (
 
 	"github.com/yeeco/yvm/lexer"
 	"github.com/yeeco/yvm/parser"
+	"github.com/yeeco/yvm/evaluator"
 )
 
 const PROMPT = ">> "
@@ -43,6 +44,11 @@ func Start(in io.Reader, out io.Writer) {
 		}
 
 		line := scanner.Text()
+
+		if line == "exit" {
+			break
+		}
+
 		l := lexer.NewLexer(line)
 		p := parser.NewParser(l)
 
@@ -52,8 +58,14 @@ func Start(in io.Reader, out io.Writer) {
 			continue
 		}
 
-		io.WriteString(out, program.String())
-		io.WriteString(out, "\n")
+		//io.WriteString(out, program.String())
+		//io.WriteString(out, "\n")
+
+		evaluated := evaluator.Eval(program)
+         if evaluated != nil {
+         	io.WriteString(out, evaluated.Inspect())
+         	io.WriteString(out, "\n")
+		 }
 	}
 }
 
