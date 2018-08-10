@@ -23,6 +23,9 @@ package object
 
 import (
 	"fmt"
+	"github.com/yeeco/yvm/ast"
+	"bytes"
+	"strings"
 )
 
 const (
@@ -31,6 +34,7 @@ const (
 	INTEGER_OBJ = "INTEGER"
 	BOOLEAN_OBJ = "BOOLEAN"
 	RETURN_VALUE_OBJ = "RETURN_VALUE"
+	FUNCTION_OBJ = "FUNCTION"
 )
 
 type ObjectType string
@@ -74,18 +78,54 @@ type ReturnValue struct {
 func (rv *ReturnValue) Type() ObjectType {return RETURN_VALUE_OBJ}
 func (rv *ReturnValue) Inspect() string {return rv.Value.Inspect()}
 
+type Function struct {
+	Parameters []*ast.Identifier
+	Body *ast.BlockStatement
+	Env *Environment
+}
+
+func (f *Function) Type() ObjectType {return FUNCTION_OBJ}
+func (f *Function) Inspect() string {
+	var out bytes.Buffer
+
+	params := []string{}
+	for _, p := range f.Parameters {
+		params = append(params, p.String())
+	}
+
+	out.WriteString("fn")
+	out.WriteString("(")
+	out.WriteString(strings.Join(params, ", "))
+	out.WriteString("){\n")
+	out.WriteString(f.Body.String())
+	out.WriteString("\n}")
+
+	return out.String()
+}
+
+
 
 type Environment struct {
 	store map[string] Object
+	outer *Environment
 }
 
 func NewEnvironment() *Environment {
 	s := make(map[string]Object)
-	return &Environment{store: s}
+	return &Environment{store: s, outer: nil}
+}
+
+func NewEnclosedEnvironment(outer *Environment) *Environment {
+	env := NewEnvironment()
+	env.outer = outer
+	return env
 }
 
 func (e *Environment) Get(name string) (Object, bool) {
 	obj, ok := e.store[name]
+	if !ok && e.outer != nil {
+		obj, ok = e.outer.Get(name)
+	}
 	return obj, ok
 }
 
@@ -93,6 +133,8 @@ func (e *Environment) Set(name string, val Object) Object {
 	e.store[name] = val
 	return val
 }
+
+
 
 //TODO: go里的primitive类型也可以实现接口的，可以用来提高性能？
 //TODO: 这里object type也可以用按token的实现不用string
