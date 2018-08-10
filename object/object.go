@@ -59,3 +59,4 @@ func (n *Null) Inspect() string {return "null"}
 
 
 //TODO: go里的primitive类型也可以实现接口的，可以用来提高性能？
+//TODO: 这里object type也可以用按token的实现不用string
