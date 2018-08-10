@@ -27,8 +27,10 @@ import (
 
 const (
 	NULL_OBJ = "NULL"
+	ERROR_OBJ = "ERROR"
 	INTEGER_OBJ = "INTEGER"
 	BOOLEAN_OBJ = "BOOLEAN"
+	RETURN_VALUE_OBJ = "RETURN_VALUE"
 )
 
 type ObjectType string
@@ -37,6 +39,14 @@ type Object interface {
 	Type() ObjectType
 	Inspect() string
 }
+
+type Error struct {
+	Message string
+}
+//TODO: 需要增加stack trace， line number，column number，lexer中增加后这儿也要增加
+
+func (e *Error) Type() ObjectType {return ERROR_OBJ}
+func (e *Error) Inspect() string {return "ERROR:" + e.Message}
 
 type Integer struct {
 	Value int64
@@ -57,6 +67,32 @@ type Null struct {}
 func (n *Null) Type() ObjectType {return NULL_OBJ}
 func (n *Null) Inspect() string {return "null"}
 
+type ReturnValue struct {
+	Value Object
+}
+
+func (rv *ReturnValue) Type() ObjectType {return RETURN_VALUE_OBJ}
+func (rv *ReturnValue) Inspect() string {return rv.Value.Inspect()}
+
+
+type Environment struct {
+	store map[string] Object
+}
+
+func NewEnvironment() *Environment {
+	s := make(map[string]Object)
+	return &Environment{store: s}
+}
+
+func (e *Environment) Get(name string) (Object, bool) {
+	obj, ok := e.store[name]
+	return obj, ok
+}
+
+func (e *Environment) Set(name string, val Object) Object {
+	e.store[name] = val
+	return val
+}
 
 //TODO: go里的primitive类型也可以实现接口的，可以用来提高性能？
 //TODO: 这里object type也可以用按token的实现不用string
