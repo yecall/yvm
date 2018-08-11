@@ -36,6 +36,7 @@ const (
 	STRING_OBJ       = "STRING"
 	RETURN_VALUE_OBJ = "RETURN_VALUE"
 	FUNCTION_OBJ     = "FUNCTION"
+	BUILTIN_OBJ = "BUILTIN"
 )
 
 type ObjectType string
@@ -112,34 +113,16 @@ type String struct {
 func (s *String) Type() ObjectType {return STRING_OBJ}
 func (s *String) Inspect() string {return s.Value}
 
-type Environment struct {
-	store map[string]Object
-	outer *Environment
+type BuiltinFunction func(args ...Object) Object
+
+type Builtin struct {
+	Fn BuiltinFunction
 }
 
-func NewEnvironment() *Environment {
-	s := make(map[string]Object)
-	return &Environment{store: s, outer: nil}
-}
+func (b *Builtin) Type() ObjectType {return BUILTIN_OBJ}
+func (b *Builtin) Inspect() string {return "builtin function"}
 
-func NewEnclosedEnvironment(outer *Environment) *Environment {
-	env := NewEnvironment()
-	env.outer = outer
-	return env
-}
 
-func (e *Environment) Get(name string) (Object, bool) {
-	obj, ok := e.store[name]
-	if !ok && e.outer != nil {
-		obj, ok = e.outer.Get(name)
-	}
-	return obj, ok
-}
-
-func (e *Environment) Set(name string, val Object) Object {
-	e.store[name] = val
-	return val
-}
 
 //TODO: go里的primitive类型也可以实现接口的，可以用来提高性能？
 //TODO: 这里object type也可以用按token的实现不用string
