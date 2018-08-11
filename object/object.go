@@ -36,7 +36,8 @@ const (
 	STRING_OBJ       = "STRING"
 	RETURN_VALUE_OBJ = "RETURN_VALUE"
 	FUNCTION_OBJ     = "FUNCTION"
-	BUILTIN_OBJ = "BUILTIN"
+	BUILTIN_OBJ      = "BUILTIN"
+	ARRAY_OBJ        = "ARRAY"
 )
 
 type ObjectType string
@@ -110,8 +111,8 @@ type String struct {
 	Value string
 }
 
-func (s *String) Type() ObjectType {return STRING_OBJ}
-func (s *String) Inspect() string {return s.Value}
+func (s *String) Type() ObjectType { return STRING_OBJ }
+func (s *String) Inspect() string  { return s.Value }
 
 type BuiltinFunction func(args ...Object) Object
 
@@ -119,10 +120,28 @@ type Builtin struct {
 	Fn BuiltinFunction
 }
 
-func (b *Builtin) Type() ObjectType {return BUILTIN_OBJ}
-func (b *Builtin) Inspect() string {return "builtin function"}
+func (b *Builtin) Type() ObjectType { return BUILTIN_OBJ }
+func (b *Builtin) Inspect() string  { return "builtin function" }
 
+type Array struct {
+	Elements []Object
+}
 
+func (a *Array) Type() ObjectType {return ARRAY_OBJ}
+func (a *Array) Inspect() string {
+	var out bytes.Buffer
+
+	elements := []string{}
+	for _, e := range a.Elements {
+		elements = append(elements, e.Inspect())
+	}
+
+	out.WriteString("[")
+	out.WriteString(strings.Join(elements, ", "))
+	out.WriteString("]")
+
+	return out.String()
+}
 
 //TODO: go里的primitive类型也可以实现接口的，可以用来提高性能？
 //TODO: 这里object type也可以用按token的实现不用string

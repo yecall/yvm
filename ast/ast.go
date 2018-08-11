@@ -24,6 +24,7 @@ package ast
 import (
 	"bytes"
 	"github.com/yeeco/yvm/token"
+	"strings"
 )
 
 type Node interface {
@@ -69,8 +70,8 @@ type LetStatement struct {
 	Value Expression
 }
 
-func (ls *LetStatement) statementNode() {}
-func (ls *LetStatement) TokenLiteral() string {return ls.Token.Literal}
+func (ls *LetStatement) statementNode()       {}
+func (ls *LetStatement) TokenLiteral() string { return ls.Token.Literal }
 func (ls *LetStatement) String() string {
 	var out bytes.Buffer
 
@@ -92,8 +93,8 @@ type Identifier struct {
 	Value string
 }
 
-func (i *Identifier) expressionNode() {}
-func (i *Identifier) TokenLiteral() string {return i.Token.Literal}
+func (i *Identifier) expressionNode()      {}
+func (i *Identifier) TokenLiteral() string { return i.Token.Literal }
 func (i *Identifier) String() string {
 	return i.Value
 }
@@ -103,8 +104,8 @@ type ReturnStatement struct {
 	ReturnValue Expression
 }
 
-func (rs *ReturnStatement) statementNode() {}
-func (rs *ReturnStatement) TokenLiteral() string {return rs.Token.Literal}
+func (rs *ReturnStatement) statementNode()       {}
+func (rs *ReturnStatement) TokenLiteral() string { return rs.Token.Literal }
 func (rs *ReturnStatement) String() string {
 	var out bytes.Buffer
 
@@ -124,8 +125,8 @@ type ExpressionStatement struct {
 	Expression Expression
 }
 
-func (es *ExpressionStatement) statementNode() {}
-func (es *ExpressionStatement) TokenLiteral() string {return es.Token.Literal}
+func (es *ExpressionStatement) statementNode()       {}
+func (es *ExpressionStatement) TokenLiteral() string { return es.Token.Literal }
 func (es *ExpressionStatement) String() string {
 	if es.Expression != nil {
 		return es.Expression.String()
@@ -138,8 +139,8 @@ type IntegerLiteral struct {
 	Value int64
 }
 
-func (il *IntegerLiteral) expressionNode() {}
-func (il *IntegerLiteral) TokenLiteral() string {return il.Token.Literal}
+func (il *IntegerLiteral) expressionNode()      {}
+func (il *IntegerLiteral) TokenLiteral() string { return il.Token.Literal }
 func (il *IntegerLiteral) String() string {
 	return il.Token.Literal
 }
@@ -149,9 +150,9 @@ type StringLiteral struct {
 	Value string
 }
 
-func (sl *StringLiteral) expressionNode() {}
-func (sl *StringLiteral) TokenLiteral() string {return sl.Token.Literal}
-func (sl *StringLiteral) String() string {return sl.Token.Literal}
+func (sl *StringLiteral) expressionNode()      {}
+func (sl *StringLiteral) TokenLiteral() string { return sl.Token.Literal }
+func (sl *StringLiteral) String() string       { return sl.Token.Literal }
 
 type PrefixExpression struct {
 	Token    token.Token // The prefix token, e.g. !
@@ -159,8 +160,8 @@ type PrefixExpression struct {
 	Right    Expression
 }
 
-func (pe *PrefixExpression) expressionNode() {}
-func (pe *PrefixExpression) TokenLiteral() string {return pe.Token.Literal}
+func (pe *PrefixExpression) expressionNode()      {}
+func (pe *PrefixExpression) TokenLiteral() string { return pe.Token.Literal }
 func (pe *PrefixExpression) String() string {
 	var out bytes.Buffer
 
@@ -189,6 +190,48 @@ func (ie *InfixExpression) String() string {
 	out.WriteString(" " + ie.Operator + " ")
 	out.WriteString(ie.Right.String())
 	out.WriteString(")")
+
+	return out.String()
+}
+
+type ArrayLiteral struct {
+	Token token.Token // the '[' token
+	Elements []Expression
+}
+
+func (al *ArrayLiteral) expressionNode()      {}
+func (al *ArrayLiteral) TokenLiteral() string { return al.Token.Literal }
+func (al *ArrayLiteral) String() string {
+	var out bytes.Buffer
+
+	elements := []string{}
+	for _, el := range al.Elements {
+		elements = append(elements, el.String())
+	}
+
+	out.WriteString("[")
+	out.WriteString(strings.Join(elements, ", "))
+	out.WriteString("]")
+
+	return out.String()
+}
+
+type IndexExpression struct {
+	Token token.Token
+	Left  Expression
+	Index Expression
+}
+
+func (ie *IndexExpression) expressionNode() {}
+func (ie *IndexExpression) TokenLiteral() string {return ie.Token.Literal}
+func (ie *IndexExpression) String() string {
+	var out bytes.Buffer
+
+	out.WriteString("(")
+	out.WriteString(ie.Left.String())
+	out.WriteString("[")
+	out.WriteString(ie.Index.String())
+	out.WriteString("])")
 
 	return out.String()
 }

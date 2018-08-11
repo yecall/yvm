@@ -47,6 +47,8 @@ const (
 	RPAREN
 	LBRACE
 	RBRACE
+	LBRACKET
+	RBRACKET
 	// Keywords
 	FUNCTION
 	LET
@@ -79,6 +81,8 @@ var tokenString = [...]string{
 	RPAREN:    ")",
 	LBRACE:    "{",
 	RBRACE:    "}",
+	LBRACKET:  "[",
+	RBRACKET:  "]",
 	FUNCTION:  "function",
 	LET:       "let",
 	TRUE:      "true",
