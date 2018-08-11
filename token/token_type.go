@@ -55,6 +55,7 @@ const (
 	IF
 	ELSE
 	RETURN
+	STRING
 )
 
 var tokenString = [...]string{
@@ -85,6 +86,7 @@ var tokenString = [...]string{
 	IF:        "if",
 	ELSE:      "else",
 	RETURN:    "return",
+	STRING:    "string",
 }
 
 func (t TokenType) String() string {
