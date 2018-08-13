@@ -30,7 +30,7 @@ import (
 	"github.com/yeeco/yvm/repl"
 )
 
-var compile = flag.Bool("c", false, "compile&vm")
+var engine = flag.String("engine", "eval", "use 'eval' or 'vm'")
 
 func main() {
 	flag.Parse()
@@ -41,9 +41,11 @@ func main() {
 	}
 	fmt.Printf("Hello %s!\n", user.Username)
 	fmt.Printf("Feel free to type in commands\n")
-	if *compile {
+	if *engine == "vm" {
 		repl.StartVM(os.Stdin, os.Stdout)
-	} else {
+	} else if *engine == "eval" {
 		repl.Start(os.Stdin, os.Stdout)
+	} else {
+		fmt.Println("Error engine")
 	}
 }
