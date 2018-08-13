@@ -26,15 +26,24 @@ import (
 	"os"
 	"os/user"
 
+	"flag"
 	"github.com/yeeco/yvm/repl"
 )
 
+var compile = flag.Bool("c", false, "compile&vm")
+
 func main() {
+	flag.Parse()
+
 	user, err := user.Current()
 	if err != nil {
 		panic(err)
 	}
 	fmt.Printf("Hello %s!\n", user.Username)
 	fmt.Printf("Feel free to type in commands\n")
-	repl.Start(os.Stdin, os.Stdout)
+	if *compile {
+		repl.StartVM(os.Stdin, os.Stdout)
+	} else {
+		repl.Start(os.Stdin, os.Stdout)
+	}
 }

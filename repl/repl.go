@@ -26,10 +26,12 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/yeeco/yvm/lexer"
-	"github.com/yeeco/yvm/parser"
+	"github.com/yeeco/yvm/compiler"
 	"github.com/yeeco/yvm/evaluator"
+	"github.com/yeeco/yvm/lexer"
 	"github.com/yeeco/yvm/object"
+	"github.com/yeeco/yvm/parser"
+	"github.com/yeeco/yvm/vm"
 )
 
 const PROMPT = ">> "
@@ -64,10 +66,54 @@ func Start(in io.Reader, out io.Writer) {
 		//io.WriteString(out, "\n")
 
 		evaluated := evaluator.Eval(program, env)
-         if evaluated != nil {
-         	io.WriteString(out, evaluated.Inspect())
-         	io.WriteString(out, "\n")
-		 }
+		if evaluated != nil {
+			io.WriteString(out, evaluated.Inspect())
+			io.WriteString(out, "\n")
+		}
+	}
+}
+
+func StartVM(in io.Reader, out io.Writer) {
+	scanner := bufio.NewScanner(in)
+
+	for {
+		fmt.Printf(PROMPT)
+		scanned := scanner.Scan()
+		if !scanned {
+			return
+		}
+
+		line := scanner.Text()
+
+		if line == "exit" {
+			break
+		}
+
+		l := lexer.NewLexer(line)
+		p := parser.NewParser(l)
+
+		program := p.ParseProgram()
+		if len(p.Errors()) != 0 {
+			printParserErrors(out, p.Errors())
+			continue
+		}
+
+		comp := compiler.NewCompiler()
+		err := comp.Compile(program)
+		if err != nil {
+			fmt.Fprintf(out, "Woops! Compilation failed:\n %s\n", err)
+			continue
+		}
+		machine := vm.NewVM(comp.Bytecode())
+		err = machine.Run()
+		if err != nil {
+			fmt.Fprintf(out, "Woops! Executing bytecode failed:\n %s\n", err)
+			continue
+		}
+
+		stackTop := machine.StackTop()
+		io.WriteString(out, stackTop.Inspect())
+		io.WriteString(out, "\n")
 	}
 }
 
