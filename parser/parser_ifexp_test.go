@@ -29,7 +29,7 @@ import (
 )
 
 func TestIfExpression(t *testing.T) {
-	input := `if (x < y) { x }`
+	input := `if (x < y) { {x} }`
 	l := lexer.NewLexer(input)
 	p := NewParser(l)
 	program := p.ParseProgram()
@@ -59,6 +59,7 @@ func TestIfExpression(t *testing.T) {
 	}
 
 	consequence, ok := exp.Consequence.Statements[0].(*ast.ExpressionStatement)
+
 	if !ok {
 		t.Fatalf("Statements[0] is not ast.ExpressionStatement. got=%T",
 			exp.Consequence.Statements[0])
