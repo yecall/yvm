@@ -154,10 +154,39 @@ func (vm *VM) Run() error {
 				return err
 			}
 
+		case code.OpArray:
+			numElements := int(code.ReadUint16(vm.instructions[ip+1:]))
+			ip += 2
+
+			array := vm.buildArray(vm.sp-numElements, vm.sp)
+			vm.sp = vm.sp - numElements
+
+			err := vm.push(array)
+			if err != nil {
+				return err
+			}
+
+		case code.OpIndex:
+			index := vm.pop()
+			left := vm.pop()
+
+			err := vm.executeIndexExpression(left, index)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
 	return nil
+}
+
+func (vm *VM) buildArray(startIndex, endIndex int) object.Object {
+	elements := make([]object.Object, endIndex-startIndex)
+
+	for i := startIndex; i < endIndex; i++ {
+		elements[i-startIndex] = vm.stack[i]
+	}
+	return &object.Array{Elements: elements}
 }
 
 func (vm *VM) executeBinaryOperation(op code.Opcode) error {
@@ -269,6 +298,29 @@ func (vm *VM) executeBangOperator() error {
 	default:
 		return vm.push(False)
 	}
+}
+
+func (vm *VM) executeIndexExpression(left, index object.Object) error {
+	switch {
+	case left.Type() == object.ARRAY_OBJ && index.Type() == object.INTEGER_OBJ:
+		return vm.executeArrayIndex(left, index)
+	//case left.Type() == object.HASH_OBJ:
+	//	return vm.executeHashIndex(left, index)
+	default:
+		return fmt.Errorf("index operator not supported: %s", left.Type())
+	}
+}
+
+func (vm *VM) executeArrayIndex(array, index object.Object) error {
+	arrayObject := array.(*object.Array)
+	i := index.(*object.Integer).Value
+	max := int64(len(arrayObject.Elements) - 1)
+
+	if i < 0 || i > max {
+		return vm.push(Null)
+	}
+
+	return vm.push(arrayObject.Elements[i])
 }
 
 func nativeBoolToBooleanObject(input bool) *object.Boolean {
