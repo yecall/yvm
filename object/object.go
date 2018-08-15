@@ -25,8 +25,8 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/yeeco/yvm/ast"
-	"strings"
 	"github.com/yeeco/yvm/code"
+	"strings"
 )
 
 const (
@@ -130,7 +130,7 @@ type Array struct {
 	Elements []Object
 }
 
-func (a *Array) Type() ObjectType {return ARRAY_OBJ}
+func (a *Array) Type() ObjectType { return ARRAY_OBJ }
 func (a *Array) Inspect() string {
 	var out bytes.Buffer
 
@@ -148,9 +148,10 @@ func (a *Array) Inspect() string {
 
 type CompiledFunction struct {
 	Instructions code.Instructions
+	NumLocals    int
 }
 
-func (cf *CompiledFunction) Type() ObjectType {return COMPILED_FUNCTION_OBJ}
+func (cf *CompiledFunction) Type() ObjectType { return COMPILED_FUNCTION_OBJ }
 func (cf *CompiledFunction) Inspect() string {
 	return fmt.Sprintf("CompiledFunction[%p]", cf)
 }

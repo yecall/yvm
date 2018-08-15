@@ -459,6 +459,5 @@ func TestArrayIndexExpressions(t *testing.T) {
 	}
 }
 
-
 //TODO:貌似测试010，!0等有问题，对于逻辑值，按理!0应该为true，但现在NULL的使用使得这个为false
 //TODO:lexer/parser中对数字串的处理，lexer中不支持前缀0x的十六进制，但parser中用parseint，支持前缀0等八进制等。

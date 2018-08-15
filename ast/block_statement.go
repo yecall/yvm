@@ -22,17 +22,17 @@
 package ast
 
 import (
-	"github.com/yeeco/yvm/token"
 	"bytes"
+	"github.com/yeeco/yvm/token"
 )
 
 type BlockStatement struct {
-	Token token.Token
+	Token      token.Token
 	Statements []Statement
 }
 
-func (bs *BlockStatement) statementNode() {}
-func (bs *BlockStatement) TokenLiteral() string {return bs.Token.Literal}
+func (bs *BlockStatement) statementNode()       {}
+func (bs *BlockStatement) TokenLiteral() string { return bs.Token.Literal }
 func (bs *BlockStatement) String() string {
 	var out bytes.Buffer
 

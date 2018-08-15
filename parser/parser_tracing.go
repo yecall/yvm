@@ -47,15 +47,18 @@ func incIdent() { traceLevel = traceLevel + 1 }
 func decIdent() { traceLevel = traceLevel - 1 }
 
 func trace(msg string) string {
-	if !traceOn {return ""}
+	if !traceOn {
+		return ""
+	}
 	incIdent()
 	tracePrint("BEGIN " + msg)
 	return msg
 }
 
 func untrace(msg string) {
-	if !traceOn {return}
+	if !traceOn {
+		return
+	}
 	tracePrint("END " + msg)
 	decIdent()
 }
-

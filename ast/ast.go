@@ -195,7 +195,7 @@ func (ie *InfixExpression) String() string {
 }
 
 type ArrayLiteral struct {
-	Token token.Token // the '[' token
+	Token    token.Token // the '[' token
 	Elements []Expression
 }
 
@@ -222,8 +222,8 @@ type IndexExpression struct {
 	Index Expression
 }
 
-func (ie *IndexExpression) expressionNode() {}
-func (ie *IndexExpression) TokenLiteral() string {return ie.Token.Literal}
+func (ie *IndexExpression) expressionNode()      {}
+func (ie *IndexExpression) TokenLiteral() string { return ie.Token.Literal }
 func (ie *IndexExpression) String() string {
 	var out bytes.Buffer
 
