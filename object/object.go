@@ -26,6 +26,7 @@ import (
 	"fmt"
 	"github.com/yeeco/yvm/ast"
 	"strings"
+	"github.com/yeeco/yvm/code"
 )
 
 const (
@@ -38,6 +39,8 @@ const (
 	FUNCTION_OBJ     = "FUNCTION"
 	BUILTIN_OBJ      = "BUILTIN"
 	ARRAY_OBJ        = "ARRAY"
+
+	COMPILED_FUNCTION_OBJ = "COMPILED_FUNCTION_OBJ"
 )
 
 type ObjectType string
@@ -141,6 +144,15 @@ func (a *Array) Inspect() string {
 	out.WriteString("]")
 
 	return out.String()
+}
+
+type CompiledFunction struct {
+	Instructions code.Instructions
+}
+
+func (cf *CompiledFunction) Type() ObjectType {return COMPILED_FUNCTION_OBJ}
+func (cf *CompiledFunction) Inspect() string {
+	return fmt.Sprintf("CompiledFunction[%p]", cf)
 }
 
 //TODO: go里的primitive类型也可以实现接口的，可以用来提高性能？
