@@ -29,7 +29,7 @@ import (
 )
 
 func TestIfExpression(t *testing.T) {
-	input := `if (x < y) { {x} }`
+	input := `if (x < y) { x }`
 	l := lexer.NewLexer(input)
 	p := NewParser(l)
 	program := p.ParseProgram()
