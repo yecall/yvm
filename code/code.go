@@ -58,6 +58,7 @@ const (
 	OpReturn
 	OpGetLocal
 	OpSetLocal
+	OpGetBuiltin
 )
 
 type Definition struct {
@@ -91,8 +92,9 @@ var definitions = map[Opcode]*Definition{
 	OpReturnValue:   {"OpReturnValue", []int{}},
 	OpReturn:        {"OpReturn", []int{}},
 	//TODO: 这个地方是不是可以统一成一个带operand的return指令？那还可以返回多个结果
-	OpGetLocal: {"OpGetLocal", []int{1}},
-	OpSetLocal: {"OpSetLocal", []int{1}},
+	OpGetLocal:   {"OpGetLocal", []int{1}},
+	OpSetLocal:   {"OpSetLocal", []int{1}},
+	OpGetBuiltin: {"OpGetBuiltin", []int{1}},
 }
 
 func Lookup(op byte) (*Definition, error) {
