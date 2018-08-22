@@ -21,14 +21,30 @@
 
 package compiler
 
-type SymbolScope string
+//type SymbolScope string
+//
+//const (
+//	GlobalScope  SymbolScope = "GLOBAL"
+//	LocalScope   SymbolScope = "LOCAL"
+//	BuiltinScope SymbolScope = "BUILTIN"
+//	FreeScope    SymbolScope = "FREE"
+//)
+
+type SymbolScope int
 
 const (
-	GlobalScope  SymbolScope = "GLOBAL"
-	LocalScope   SymbolScope = "LOCAL"
-	BuiltinScope SymbolScope = "BUILTIN"
-	FreeScope    SymbolScope = "FREE"
+	GlobalScope SymbolScope = iota
+	LocalScope
+	BuiltinScope
+	FreeScope
 )
+
+//var scopeString = [...]string{
+//	GlobalScope:  "GLOBAL",
+//	LocalScope:   "LOCAL",
+//	BuiltinScope: "BUILTIN",
+//	FreeScope:    "FREE",
+//}
 
 type Symbol struct {
 	Name  string
@@ -104,5 +120,3 @@ func (s *SymbolTable) defineFree(original Symbol) Symbol {
 	s.store[original.Name] = symbol
 	return symbol
 }
-
-//TODO: 这个地方scope也可以从string转到int

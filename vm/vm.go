@@ -305,12 +305,12 @@ func (vm *VM) pushClosure(constIndex int, numFree int) error {
 	}
 
 	free := make([]object.Object, numFree)
-	for i:=0; i<numFree; i++ {
+	for i := 0; i < numFree; i++ {
 		free[i] = vm.stack[vm.sp-numFree+i]
 	}
 	vm.sp = vm.sp - numFree
 
-	closure := &object.Closure{Fn: function, Free:free}
+	closure := &object.Closure{Fn: function, Free: free}
 	return vm.push(closure)
 }
 
@@ -441,7 +441,7 @@ func (vm *VM) executeComparison(op code.Opcode) error {
 	case code.OpNotEqual:
 		return vm.push(nativeBoolToBooleanObject(right != left))
 	default:
-		return fmt.Errorf("unknown operator: %d (%s %s)", op, left.Type(), right.Type())
+		return fmt.Errorf("unknown operator: %d (%s %s)", op, left.TypeString(), right.TypeString())
 	}
 }
 
@@ -465,7 +465,7 @@ func (vm *VM) executeMinusOperator() error {
 	operand := vm.pop()
 
 	if operand.Type() != object.INTEGER_OBJ {
-		return fmt.Errorf("unsupported type for negation: %s", operand.Type())
+		return fmt.Errorf("unsupported type for negation: %s", operand.TypeString())
 	}
 
 	value := operand.(*object.Integer).Value
@@ -494,7 +494,7 @@ func (vm *VM) executeIndexExpression(left, index object.Object) error {
 	//case left.Type() == object.HASH_OBJ:
 	//	return vm.executeHashIndex(left, index)
 	default:
-		return fmt.Errorf("index operator not supported: %s", left.Type())
+		return fmt.Errorf("index operator not supported: %s", left.TypeString())
 	}
 }
 
