@@ -208,7 +208,7 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 			return leftExp
 		}
 
-		p.nextToken()
+		p.nextToken() //前面是peek，这儿才真正next。expr最后也不next
 
 		leftExp = infix(leftExp)
 	}

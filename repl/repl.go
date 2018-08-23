@@ -133,3 +133,7 @@ func printParserErrors(out io.Writer, errors []string) {
 		io.WriteString(out, "\t"+msg+"\n")
 	}
 }
+
+//TODO: 加一个开关能够显示op code，把字节码print出来
+//TODO: Bytecode的序列化和反序列化
+//TODO: repl支持多行输入

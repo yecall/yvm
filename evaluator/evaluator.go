@@ -284,11 +284,17 @@ func evalIdentifier(node *ast.Identifier, env *object.Environment) object.Object
 		return val
 	}
 
-	if builtin, ok := builtins[node.Value]; ok {
+	//if builtin, ok := builtins[node.Value]; ok {
+	//	return builtin
+	//}
+
+	builtin := object.GetBuiltinByName(node.Value)
+	if builtin != nil {
 		return builtin
 	}
 
 	return newError("identifier not found: " + node.Value)
+	//TODO:这个地方如果一个ident的名字与内置函数冲突，就有问题了
 }
 
 func evalExpressions(exps []ast.Expression, env *object.Environment) []object.Object {
