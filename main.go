@@ -31,6 +31,7 @@ import (
 )
 
 var engine = flag.String("engine", "eval", "use 'eval' or 'vm'")
+var verbose = flag.Bool("v", false, "verbose")
 
 func main() {
 	flag.Parse()
@@ -42,7 +43,7 @@ func main() {
 	fmt.Printf("Hello %s!\n", user.Username)
 	fmt.Printf("Feel free to type in commands\n")
 	if *engine == "vm" {
-		repl.StartVM(os.Stdin, os.Stdout)
+		repl.StartVM(os.Stdin, os.Stdout, *verbose)
 	} else if *engine == "eval" {
 		repl.Start(os.Stdin, os.Stdout)
 	} else {

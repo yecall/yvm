@@ -73,7 +73,7 @@ func Start(in io.Reader, out io.Writer) {
 	}
 }
 
-func StartVM(in io.Reader, out io.Writer) {
+func StartVM(in io.Reader, out io.Writer, verbose bool) {
 	scanner := bufio.NewScanner(in)
 
 	constants := []object.Object{}
@@ -115,6 +115,11 @@ func StartVM(in io.Reader, out io.Writer) {
 		code := comp.Bytecode()
 		constants = code.Constants
 
+		if verbose {
+			printByteCode(out, code)
+			printGlobals(out, globals)
+		}
+
 		machine := vm.NewVMWithGlobalsStore(code, globals)
 		err = machine.Run()
 		if err != nil {
@@ -133,6 +138,42 @@ func printParserErrors(out io.Writer, errors []string) {
 		io.WriteString(out, "\t"+msg+"\n")
 	}
 }
+
+func printByteCode(out io.Writer, code *compiler.Bytecode){
+	fmt.Fprintln(out, "Constants:")
+	for i, obj := range code.Constants {
+		fmt.Fprintf(out, "%4d: %s", i, obj.Inspect())
+		fmt.Fprintln(out)
+
+		if obj.Type() == object.COMPILED_FUNCTION_OBJ {
+			o := obj.(*object.CompiledFunction)
+			fmt.Fprintf(out, o.Instructions.String())
+		}
+	}
+
+	fmt.Fprintln(out)
+	fmt.Fprintln(out, "Instructions:")
+	fmt.Fprintf(out, code.Instructions.String())
+}
+
+func printGlobals(out io.Writer, globals []object.Object){
+	fmt.Fprintln(out)
+	fmt.Fprintln(out, "Globals:")
+	for i, obj := range globals {
+		if obj == nil {
+			break
+		}
+		fmt.Fprintf(out, "%4d: %s", i, obj.Inspect())
+		fmt.Fprintln(out)
+
+		if obj.Type() == object.COMPILED_FUNCTION_OBJ {
+			o := obj.(*object.CompiledFunction)
+			fmt.Fprintf(out, o.Instructions.String())
+		}
+	}
+	fmt.Fprintln(out)
+}
+
 
 //TODO: 加一个开关能够显示op code，把字节码print出来
 //TODO: Bytecode的序列化和反序列化

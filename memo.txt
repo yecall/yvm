@@ -1,0 +1,16 @@
+task:
+
+1. 定义语言规范
+2. 支持
+   大数，unicode，
+   map，struct，object，hash，enum
+   control flow：for，range，switch
+   assert
+   赋值，多返回，多变量赋值
+   定时执行
+   gas
+   程序库，lib，标准库
+   repl优化
+   参数传值，传引用问题
+
+3.

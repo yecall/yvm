@@ -452,4 +452,4 @@ type Bytecode struct {
 }
 
 //TODO：GlobalScope和LocalScope有必要区分么？另外字符串比较性能也比较差
-//TODO：Bytecode可以序列化到文件，然后vm从文件中加载执行
+//TODO：Bytecode可以序列化到文件，然后vm从文件中加载执行, 也可以转成string，可以单独一个文件
