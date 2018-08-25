@@ -12,5 +12,8 @@ task:
    程序库，lib，标准库
    repl优化
    参数传值，传引用问题
+   赋值语句左边现在只能是ident，还不能是a[1]之类，如果有struct，还有成员赋值等
+   return现在必须有value
+   vm中如果if（TRUE）{}这种会crash，eval不会
 
 3.

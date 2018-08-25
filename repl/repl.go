@@ -117,7 +117,6 @@ func StartVM(in io.Reader, out io.Writer, verbose bool) {
 
 		if verbose {
 			printByteCode(out, code)
-			printGlobals(out, globals)
 		}
 
 		machine := vm.NewVMWithGlobalsStore(code, globals)
@@ -125,6 +124,10 @@ func StartVM(in io.Reader, out io.Writer, verbose bool) {
 		if err != nil {
 			fmt.Fprintf(out, "Woops! Executing bytecode failed:\n %s\n", err)
 			continue
+		}
+
+		if verbose {
+			printGlobals(out, globals)
 		}
 
 		lastPopped := machine.LastPoppedStackElem()
@@ -139,7 +142,7 @@ func printParserErrors(out io.Writer, errors []string) {
 	}
 }
 
-func printByteCode(out io.Writer, code *compiler.Bytecode){
+func printByteCode(out io.Writer, code *compiler.Bytecode) {
 	fmt.Fprintln(out, "Constants:")
 	for i, obj := range code.Constants {
 		fmt.Fprintf(out, "%4d: %s", i, obj.Inspect())
@@ -156,7 +159,7 @@ func printByteCode(out io.Writer, code *compiler.Bytecode){
 	fmt.Fprintf(out, code.Instructions.String())
 }
 
-func printGlobals(out io.Writer, globals []object.Object){
+func printGlobals(out io.Writer, globals []object.Object) {
 	fmt.Fprintln(out)
 	fmt.Fprintln(out, "Globals:")
 	for i, obj := range globals {
@@ -173,7 +176,6 @@ func printGlobals(out io.Writer, globals []object.Object){
 	}
 	fmt.Fprintln(out)
 }
-
 
 //TODO: 加一个开关能够显示op code，把字节码print出来
 //TODO: Bytecode的序列化和反序列化
