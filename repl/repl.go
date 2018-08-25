@@ -26,115 +26,131 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/peterh/liner"
 	"github.com/yeeco/yvm/compiler"
 	"github.com/yeeco/yvm/evaluator"
 	"github.com/yeeco/yvm/lexer"
 	"github.com/yeeco/yvm/object"
 	"github.com/yeeco/yvm/parser"
 	"github.com/yeeco/yvm/vm"
+	"os"
+	"path/filepath"
+	"strings"
 )
 
 const PROMPT = ">> "
 
-func Start(in io.Reader, out io.Writer) {
-	scanner := bufio.NewScanner(in)
-	env := object.NewEnvironment()
+func Start(out io.Writer, engine string, verbose bool) {
+	l := liner.NewLiner()
+	defer l.Close()
+
+	var lines []string
+	l.SetCtrlCAborts(true)
+	l.SetMultiLineMode(true)
+
+	history := filepath.Join(os.TempDir(), ".yvm_history")
+	if f, err := os.Open(history); err == nil {
+		l.ReadHistory(f)
+		f.Close()
+	}
+
+	// for eval
+	var env *object.Environment
+
+	// for vm
+	var constants []object.Object
+	var globals []object.Object
+	var symbolTable *compiler.SymbolTable
+
+	if engine == "eval" {
+		env = object.NewEnvironment()
+	} else if engine == "vm" {
+		constants = []object.Object{}
+		globals = make([]object.Object, vm.GlobalsSize)
+		symbolTable = compiler.NewSymbolTable()
+		for i, v := range object.Builtins {
+			symbolTable.DefineBuiltin(i, v.Name)
+		}
+	} else {
+		fmt.Println("Error engine")
+		return
+	}
 
 	for {
-		fmt.Printf(PROMPT)
-		scanned := scanner.Scan()
-		if !scanned {
-			return
-		}
+		if line, err := l.Prompt(PROMPT); err == nil {
+			if line == "exit" || line == "quit" {
+				if f, err := os.Create(history); err == nil {
+					l.WriteHistory(f)
+					f.Close()
+				}
+				break
+			}
 
-		line := scanner.Text()
+			tmp := strings.TrimSpace(line)
+			if len(tmp) == 0 {
+				continue
+			}
 
-		if line == "exit" {
-			break
-		}
+			if tmp[len(tmp)-1:] == "\\" {
+				lines = append(lines, strings.TrimRight(tmp, "\\"))
+				continue
+			} else {
+				lines = append(lines, tmp)
+			}
 
-		l := lexer.NewLexer(line)
-		p := parser.NewParser(l)
+			input := strings.Join(lines, "")
+			l.AppendHistory(input)
+			lines = nil
 
-		program := p.ParseProgram()
-		if len(p.Errors()) != 0 {
-			printParserErrors(out, p.Errors())
-			continue
-		}
+			l := lexer.NewLexer(input)
+			p := parser.NewParser(l)
 
-		//io.WriteString(out, program.String())
-		//io.WriteString(out, "\n")
+			program := p.ParseProgram()
+			if len(p.Errors()) != 0 {
+				printParserErrors(out, p.Errors())
+				continue
+			}
 
-		evaluated := evaluator.Eval(program, env)
-		if evaluated != nil {
-			io.WriteString(out, evaluated.Inspect())
-			io.WriteString(out, "\n")
+			if engine == "eval" {
+				evaluated := evaluator.Eval(program, env)
+				if evaluated != nil {
+					io.WriteString(out, evaluated.Inspect())
+					io.WriteString(out, "\n")
+				}
+			} else if engine == "vm" {
+				comp := compiler.NewCompilerWithState(symbolTable, constants)
+				err := comp.Compile(program)
+				if err != nil {
+					fmt.Fprintf(out, "Woops! Compilation failed:\n %s\n", err)
+					continue
+				}
+
+				code := comp.Bytecode()
+				constants = code.Constants
+
+				if verbose {
+					printByteCode(out, code)
+				}
+
+				machine := vm.NewVMWithGlobalsStore(code, globals)
+				err = machine.Run()
+				if err != nil {
+					fmt.Fprintf(out, "Woops! Executing bytecode failed:\n %s\n", err)
+					continue
+				}
+
+				if verbose {
+					printGlobals(out, globals)
+				}
+
+				lastPopped := machine.LastPoppedStackElem()
+				io.WriteString(out, lastPopped.Inspect())
+				io.WriteString(out, "\n")
+			}
 		}
 	}
 }
 
-func StartVM(in io.Reader, out io.Writer, verbose bool) {
-	scanner := bufio.NewScanner(in)
-
-	constants := []object.Object{}
-	globals := make([]object.Object, vm.GlobalsSize)
-	symbolTable := compiler.NewSymbolTable()
-	for i, v := range object.Builtins {
-		symbolTable.DefineBuiltin(i, v.Name)
-	}
-
-	for {
-		fmt.Printf(PROMPT)
-		scanned := scanner.Scan()
-		if !scanned {
-			return
-		}
-
-		line := scanner.Text()
-
-		if line == "exit" {
-			break
-		}
-
-		l := lexer.NewLexer(line)
-		p := parser.NewParser(l)
-
-		program := p.ParseProgram()
-		if len(p.Errors()) != 0 {
-			printParserErrors(out, p.Errors())
-			continue
-		}
-
-		comp := compiler.NewCompilerWithState(symbolTable, constants)
-		err := comp.Compile(program)
-		if err != nil {
-			fmt.Fprintf(out, "Woops! Compilation failed:\n %s\n", err)
-			continue
-		}
-
-		code := comp.Bytecode()
-		constants = code.Constants
-
-		if verbose {
-			printByteCode(out, code)
-		}
-
-		machine := vm.NewVMWithGlobalsStore(code, globals)
-		err = machine.Run()
-		if err != nil {
-			fmt.Fprintf(out, "Woops! Executing bytecode failed:\n %s\n", err)
-			continue
-		}
-
-		if verbose {
-			printGlobals(out, globals)
-		}
-
-		lastPopped := machine.LastPoppedStackElem()
-		io.WriteString(out, lastPopped.Inspect())
-		io.WriteString(out, "\n")
-	}
-}
 
 func printParserErrors(out io.Writer, errors []string) {
 	for _, msg := range errors {

@@ -40,13 +40,9 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
 	fmt.Printf("Hello %s!\n", user.Username)
-	fmt.Printf("Feel free to type in commands\n")
-	if *engine == "vm" {
-		repl.StartVM(os.Stdin, os.Stdout, *verbose)
-	} else if *engine == "eval" {
-		repl.Start(os.Stdin, os.Stdout)
-	} else {
-		fmt.Println("Error engine")
-	}
+	fmt.Printf("Feel free to type in commands to %v\n", *engine)
+
+	repl.Start(os.Stdout, *engine, *verbose)
 }
