@@ -22,8 +22,13 @@
 package repl
 
 import (
+	"bytes"
+	"encoding/gob"
 	"fmt"
 	"io"
+	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/peterh/liner"
 	"github.com/yeeco/yvm/compiler"
@@ -32,18 +37,14 @@ import (
 	"github.com/yeeco/yvm/object"
 	"github.com/yeeco/yvm/parser"
 	"github.com/yeeco/yvm/vm"
-	"os"
-	"path/filepath"
-	"strings"
-	"bytes"
-	"encoding/gob"
 )
 
 const PROMPT = ">> "
 
 func init() {
-	//gob.Register(&object.Boolean{}) //?这个不注册貌似可以？
+	//gob.Register(&object.Boolean{}) //?这个不注册貌似可以？因为bool值不会进constant
 	gob.Register(&object.Integer{})
+	gob.Register(&object.String{})
 	gob.Register(&object.CompiledFunction{})
 }
 

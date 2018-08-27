@@ -1,6 +1,7 @@
 task:
 
 1. 定义语言规范
+
 2. 支持
    大数，unicode，
    map，struct，object，hash，enum
@@ -16,4 +17,19 @@ task:
    return现在必须有value
    vm中如果if（TRUE）{}这种会crash，eval不会
 
-3.
+3. 做一个命令行工具
+   yvm -engine=[eval|vm] -v  启动交互式console
+   yvm parse，输出ast
+   yvm build, 输出bytecode文件
+   yvm run，执行bytecode文件
+   yvm deasm bytecode文件反汇编打印
+   yvm lexer，词法分析
+   yvm eval，执行ast文件
+
+4. 研究下：
+   oo的编译
+   声明，变量声明，函数声明
+   多遍pass方式
+   垃圾收集、多routine、通信、并行执行、性能优化
+   持久化对象
+
