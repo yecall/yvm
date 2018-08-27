@@ -22,7 +22,6 @@
 package repl
 
 import (
-	"bufio"
 	"fmt"
 	"io"
 
@@ -36,9 +35,17 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"bytes"
+	"encoding/gob"
 )
 
 const PROMPT = ">> "
+
+func init() {
+	//gob.Register(&object.Boolean{}) //?这个不注册貌似可以？
+	gob.Register(&object.Integer{})
+	gob.Register(&object.CompiledFunction{})
+}
 
 func Start(out io.Writer, engine string, verbose bool) {
 	l := liner.NewLiner()
@@ -132,6 +139,8 @@ func Start(out io.Writer, engine string, verbose bool) {
 					printByteCode(out, code)
 				}
 
+				code = Deserialize(Serialize(code))
+
 				machine := vm.NewVMWithGlobalsStore(code, globals)
 				err = machine.Run()
 				if err != nil {
@@ -151,6 +160,30 @@ func Start(out io.Writer, engine string, verbose bool) {
 	}
 }
 
+func Serialize(code *compiler.Bytecode) []byte {
+	var buf bytes.Buffer
+
+	enc := gob.NewEncoder(&buf)
+	if err := enc.Encode(code); err != nil {
+		fmt.Println("encode error:", err)
+	}
+
+	return buf.Bytes()
+}
+
+func Deserialize(c []byte) *compiler.Bytecode {
+	var buf bytes.Buffer
+
+	buf.Write(c)
+	dec := gob.NewDecoder(&buf)
+
+	bc := compiler.Bytecode{}
+	if err := dec.Decode(&bc); err != nil {
+		fmt.Println("decode error:", err)
+	}
+
+	return &bc
+}
 
 func printParserErrors(out io.Writer, errors []string) {
 	for _, msg := range errors {
