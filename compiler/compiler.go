@@ -101,6 +101,7 @@ func (c *Compiler) Compile(node ast.Node) error {
 			return err
 		}
 		c.emit(code.OpPop)
+		//TODO:这个地方这样不大优雅，应该在blockstatement中处理，repl也改一下。
 
 	case *ast.PrefixExpression:
 		err := c.Compile(node.Right)

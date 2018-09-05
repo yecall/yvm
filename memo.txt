@@ -33,3 +33,4 @@ task:
    垃圾收集、多routine、通信、并行执行、性能优化
    持久化对象
 
+5. VM性能，jump table
